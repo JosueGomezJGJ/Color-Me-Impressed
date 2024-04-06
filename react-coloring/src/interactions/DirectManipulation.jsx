@@ -1,34 +1,53 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
-let _ = require('underscore');
-let paper = require('paper');
+let _ = require("underscore");
+let paper = require("paper");
 
-const createDMCircle = ()=>{
-    const t = new paper.PointText({
-      point: paper.view.center,
-      content: 'TODO: Direct Manipulation.jsx',
-      fillColor: 'black',
-      fontSize: 20, 
-      onMouseDown: function(event){
-        //TODO
-      }, 
-      oneMouseMove: function(event){
-        //TODO
-      },
-      onMouseUp: function(event){
-        //TODO
+const createDMCircle = () => {
+  const t = new paper.Path.Circle({
+    radius: 150,
+    fillColor: "red",
+    strokeColor: "black",
+    strokeWidth: 3,
+    onMouseDown: function (event) {
+      this.dragging = true;
+      this.fillColor = "blue";
+    },
+    onMouseDrag: function (event) {
+      if (this.dragging) {
+        this.position = this.position.add(event.delta);
       }
-    });
-    t.position = paper.view.center;
-}
+    },
+    onMouseUp: function (event) {
+      this.fillColor = "red";
+      this.dragging = false;
+    },
+  });
+  // const t = new paper.PointText({
+  //   point: paper.view.center,
+  //   content: "TODO: Direct Manipulation.jsx",
+  //   fillColor: "black",
+  //   fontSize: 20,
+  //   onMouseDown: function (event) {
+  //     //TODO
+  //   },
+  //   oneMouseMove: function (event) {
+  //     //TODO
+  //   },
+  //   onMouseUp: function (event) {
+  //     //TODO
+  //   },
+  // });
+  t.position = paper.view.center;
+};
 
 const DirectManipulation = (paperReady) => {
   useEffect(() => {
-    if(paperReady && paper.project){ 
+    if (paperReady && paper.project) {
       paper.project.clear();
       createDMCircle();
     }
-  }, [paperReady])
-}
+  }, [paperReady]);
+};
 
-export {DirectManipulation};
+export { DirectManipulation };
