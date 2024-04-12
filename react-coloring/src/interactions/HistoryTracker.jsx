@@ -15,17 +15,22 @@ const HistoryTracker = ({
     if (paperReady && paper.project) {
       paper.project.clear();
     }
+
+    return () => {
+      if (paper.project) {
+        paper.project.clear();
+      }
+    };
   }, [paperReady]);
 
   const undo = () => {
     if (undoStack.length > 0) {
       const newUndoStack = [...undoStack];
-      const historyEvent = newUndoStack.splice(0,1)[0];
+      const historyEvent = newUndoStack.splice(0, 1)[0];
 
       historyEvent.inverse();
 
-      const newRedoStack = [historyEvent,...redoStack];
-
+      const newRedoStack = [historyEvent, ...redoStack];
 
       setUndoStack(newUndoStack);
       setRedoStack(newRedoStack);
@@ -35,11 +40,11 @@ const HistoryTracker = ({
   const redo = () => {
     if (redoStack.length > 0) {
       const newRedoStack = [...redoStack];
-      const historyEvent = newRedoStack.splice(0,1)[0];
+      const historyEvent = newRedoStack.splice(0, 1)[0];
 
       historyEvent.action();
 
-      const newUndoStack = [historyEvent,...undoStack];
+      const newUndoStack = [historyEvent, ...undoStack];
 
       setUndoStack(newUndoStack);
       setRedoStack(newRedoStack);

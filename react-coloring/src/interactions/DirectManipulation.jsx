@@ -47,6 +47,12 @@ const DirectManipulation = (paperReady) => {
       paper.project.clear();
       createDMCircle();
     }
+
+    return () => {
+      if (paper.project) {
+        paper.project.clear();
+      }
+    };
   }, [paperReady]);
 };
 
