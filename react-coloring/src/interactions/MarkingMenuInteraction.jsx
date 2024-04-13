@@ -74,8 +74,9 @@ const bindInteractivity = (setHistory) => {
       } else {
         if (region === "ClearRegion") {
           swatch.fillColor = new paper.Color("white");
-          paper.activeColor = swatch.fillColor;
           originalBrightness = paper.activeColor.brightness;
+        } else {
+          swatch.fillColor = paper.activeColor;
         }
       }
     },
@@ -89,6 +90,8 @@ const bindInteractivity = (setHistory) => {
       if (region === "EyedropperRegion") {
         originalBrightness = paper.activeColor.brightness;
         eyedropperActive = true;
+      } else if (region === "ClearRegion") {
+        paper.activeColor = new paper.Color("white");
       }
     },
     onMouseDown: function (event) {
