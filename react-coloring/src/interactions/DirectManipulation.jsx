@@ -23,21 +23,6 @@ const createDMCircle = () => {
       this.dragging = false;
     },
   });
-  // const t = new paper.PointText({
-  //   point: paper.view.center,
-  //   content: "TODO: Direct Manipulation.jsx",
-  //   fillColor: "black",
-  //   fontSize: 20,
-  //   onMouseDown: function (event) {
-  //     //TODO
-  //   },
-  //   oneMouseMove: function (event) {
-  //     //TODO
-  //   },
-  //   onMouseUp: function (event) {
-  //     //TODO
-  //   },
-  // });
   t.position = paper.view.center;
 };
 

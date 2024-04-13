@@ -9,6 +9,9 @@ const _ = require("underscore");
 const bindInteractivity = (setHistory) => {
   paper.activeColor = new paper.Color("red"); // Binding global variable to paper object
   paper.activeColor.brightness = 0.5;
+  let originalBrightness = paper.activeColor.brightness;
+
+  const menuRadius = 200;
 
   const hitOptions = {
     stroke: false,
@@ -22,6 +25,7 @@ const bindInteractivity = (setHistory) => {
   menu.visible = false; // Comment out when you are ready to test.
 
   const swatch = paper.project.getItem({ name: "Swatch" }); // The Middle of the Marking Menu
+  let eyedropperActive = false;
 
   new paper.Tool({
     name: "marking",
@@ -36,16 +40,56 @@ const bindInteractivity = (setHistory) => {
     },
     onMouseMove: function (event) {
       const region = this.getRegion(event.point);
-      console.log("MM", region);
+      if (region === "BrightenRegion" || region === "DarkenRegion") {
+        const center = menu.position;
+        const distance = center.getDistance(event.point);
+        const adjustmentRatio = distance / menuRadius;
+
+        if (region === "BrightenRegion" && paper.activeColor.brightness < 1) {
+          const newBrightness = Math.min(
+            originalBrightness + adjustmentRatio * (1 - originalBrightness),
+            1
+          );
+          swatch.fillColor = new paper.Color({
+            hue: paper.activeColor.hue,
+            saturation: paper.activeColor.saturation,
+            brightness: newBrightness,
+          });
+          paper.activeColor = swatch.fillColor;
+        } else if (
+          region === "DarkenRegion" &&
+          paper.activeColor.brightness > 0
+        ) {
+          const newBrightness = Math.max(
+            originalBrightness - adjustmentRatio * originalBrightness,
+            0
+          );
+          swatch.fillColor = new paper.Color({
+            hue: paper.activeColor.hue,
+            saturation: paper.activeColor.saturation,
+            brightness: newBrightness,
+          });
+          paper.activeColor = swatch.fillColor;
+        }
+      } else {
+        if (region === "ClearRegion") {
+          swatch.fillColor = new paper.Color("white");
+          paper.activeColor = swatch.fillColor;
+          originalBrightness = paper.activeColor.brightness;
+        }
+      }
     },
     onMouseLeave: function (event) {
-      const region = this.getRegion(event.point);
-      console.log("ML", region);
+      console.log("ML", this.getRegion(event.point));
     },
     onMouseUp: function (event) {
       const region = this.getRegion(event.point);
       menu.visible = false;
-      console.log("MU", region);
+
+      if (region === "EyedropperRegion") {
+        originalBrightness = paper.activeColor.brightness;
+        eyedropperActive = true;
+      }
     },
     onMouseDown: function (event) {
       const region = this.getRegion(event.point);
@@ -55,11 +99,21 @@ const bindInteractivity = (setHistory) => {
           event.event.clientY - 75
         );
         menu.visible = true;
+        originalBrightness = paper.activeColor.brightness;
       }
-      if (region) {
-        // TODO
 
-        return;
+      if (eyedropperActive) {
+        const hit = paper.project.hitTest(event.point, hitOptions);
+        if (
+          hit &&
+          hit.item !== menu &&
+          hit.item.fillColor &&
+          hit.item.fillColor.brightness > 0
+        ) {
+          paper.activeColor = hit.item.fillColor;
+          originalBrightness = paper.activeColor.brightness;
+        }
+        eyedropperActive = false;
       }
 
       // BUCKET INTERACTION -- WILL COLOR ANY WHITE CELL WITH ACTIVE COLOR
